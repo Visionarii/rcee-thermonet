@@ -31,4 +31,4 @@ uv run rcee diagnostica --headless
 
 Senza Google Chrome si usa il Chromium di Playwright: `uv run playwright install chromium`.
 
-La prova su Windows gira anche su GitHub: Actions, "Prova su Windows", Run workflow.
+La prova automatica su un Windows di GitHub è pronta in `strumenti/ci-windows.yml` (inattiva).

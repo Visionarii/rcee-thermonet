@@ -1,3 +1,6 @@
+# Prova automatica su un Windows di GitHub (windows-latest).
+# Inattiva finché sta qui. Per attivarla: spostala in .github/workflows/
+# (serve il permesso "workflow" del token: gh auth refresh -h github.com -s workflow).
 # Prova su un Windows di GitHub: si avvia a mano (Actions > Prova su Windows > Run workflow).
 name: Prova su Windows
 

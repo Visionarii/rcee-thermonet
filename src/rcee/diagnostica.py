@@ -40,7 +40,9 @@ def prova_browser(headless: bool) -> tuple[bool, list[str]]:
                 risposta = pagina.goto(URL_PORTALE, wait_until="commit", timeout=60_000)
                 stato = risposta.status if risposta else None
                 titolo, agente = _attendi_pagina(pagina)
-                arrivo = pagina.url
+                arrivo = pagina.url.split("?")[0]
+                login = pagina.locator("input[type=password]").count() > 0
+                captcha = "captcha" in pagina.content().lower()
             finally:
                 contesto.close()
     except Exception as errore:  # noqa: BLE001 - la diagnostica riporta l'errore invece di fermarsi
@@ -57,6 +59,7 @@ def prova_browser(headless: bool) -> tuple[bool, list[str]]:
         f"Browser: {nome} ({versione})",
         f"Portale: {URL_PORTALE}",
         f"Risposta: HTTP {stato}, arrivo su {arrivo}, titolo «{titolo}»",
+        f"Modulo di login: {'trovato' if login else 'non presente'}, captcha: {'SÌ' if captcha else 'no'}",
         f"Tempo totale: {time.monotonic() - inizio:.1f} s",
     ]
 

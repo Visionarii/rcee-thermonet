@@ -10,6 +10,7 @@ di Nuova Salento Energia, a partire dalla foto del rapportino mandata su Telegra
 | `uv run rcee diagnostica` | Controlla computer, browser sul portale e OCR; scrive `dati/diagnostica.txt` |
 | `uv run rcee installa-ocr` | Scarica llama.cpp (su Windows) e il modello PaddleOCR-VL 1.6 (circa 1,8 GB) |
 | `uv run rcee registra` | Registra una pratica sul portale con Playwright codegen, login escluso |
+| `uv run rcee esplora` | Dopo il login elenca menu e pulsanti del portale (cerca l'import XML), senza cliccare |
 
 Installazione sul PC dell'ufficio: [ISTRUZIONI-WINDOWS.md](ISTRUZIONI-WINDOWS.md).
 

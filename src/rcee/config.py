@@ -11,7 +11,7 @@ _RADICE = Path(__file__).resolve().parents[2]
 
 DATI = Path(os.environ.get("RCEE_DATI", _RADICE / "dati"))
 URL_PORTALE = os.environ.get(
-    "RCEE_URL_PORTALE", "https://nuovasalentoenergia.thermonet.parsec326.cloud"
+    "RCEE_URL_PORTALE", "https://nuovasalentoenergia.thermonet.parsec326.cloud/web"
 )
 
 

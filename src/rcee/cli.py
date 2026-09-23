@@ -25,6 +25,9 @@ def main(argv: list[str] | None = None) -> int:
     comandi.add_parser(
         "registra", help="registra una pratica sul portale, login escluso"
     )
+    comandi.add_parser(
+        "esplora", help="elenca menu e pulsanti del portale (cerca l'import XML)"
+    )
     argomenti = parser.parse_args(argv)
 
     if argomenti.comando == "diagnostica":
@@ -35,6 +38,10 @@ def main(argv: list[str] | None = None) -> int:
         from .ocr import installa
 
         return installa()
+    if argomenti.comando == "esplora":
+        from .esplora import esegui
+
+        return esegui()
     from .registra import esegui
 
     return esegui()

@@ -1,0 +1,21 @@
+# Dati locali: mai su GitHub (profili Chrome, sessioni, modelli, foto, PDF, registrazioni, log)
+/dati/
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.heic
+.env
+*.env
+sessione*.json
+auth*.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Sistema
+.DS_Store
+Thumbs.db

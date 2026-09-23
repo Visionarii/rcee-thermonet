@@ -1,0 +1,29 @@
+# Prova su un Windows di GitHub: si avvia a mano (Actions > Prova su Windows > Run workflow).
+name: Prova su Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+      - run: uv run pytest -q
+      - uses: actions/cache@v4
+        with:
+          path: dati/modelli
+          key: paddleocr-vl-1.6-gguf
+      - run: uv run rcee installa-ocr
+      - run: uv run rcee diagnostica --headless
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostica
+          path: |
+            dati/diagnostica.txt
+            dati/log/
+          if-no-files-found: ignore

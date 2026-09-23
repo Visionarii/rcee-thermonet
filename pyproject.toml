@@ -1,0 +1,28 @@
+[project]
+name = "rcee-thermonet"
+version = "0.1.0"
+description = "Inserimento automatico dei rapporti RCEE su ThermoNET (Nuova Salento Energia)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "huggingface-hub>=0.35",
+    "pillow>=11",
+    "playwright>=1.55",
+    "psutil>=7",
+]
+
+[project.scripts]
+rcee = "rcee.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rcee"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

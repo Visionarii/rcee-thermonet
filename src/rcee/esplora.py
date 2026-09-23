@@ -18,6 +18,7 @@ PAROLE_CHIAVE = re.compile(
     r"import|xml|tracciat|massiv|carica|upload|trasmission|allegat|esport|export|rct|rapport|bozz",
     re.IGNORECASE,
 )
+_SOLO_NUMERI = re.compile(r"[\d\s./-]+")
 
 _RACCOGLI = """
 () => {
@@ -55,8 +56,11 @@ def raccogli_voci(pagina: Page) -> tuple[list[str], list[str]]:
         except Error:
             continue  # frame chiuso nel frattempo
         for voce in voci:
+            if _SOLO_NUMERI.fullmatch(voce["testo"]):
+                continue  # numeri di pratica o di impianto
             href = voce["href"]
-            if href in ("", "#") or href.startswith("javascript"):
+            # Nel portale (XAF) i link sono default.aspx#<codice cifrato>: non dicono nulla.
+            if "#" in href or href.startswith("javascript"):
                 href = ""
             riga = voce["testo"] + (f"  [{href}]" if href else "")
             if PAROLE_CHIAVE.search(voce["testo"]) or PAROLE_CHIAVE.search(href):

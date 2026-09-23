@@ -5,7 +5,7 @@ from rcee.esplora import raccogli_voci
 
 PAGINA = """
 <nav><a href="/rct/elenco">Rapporti di controllo</a><a href="/richieste?stato=1">Richieste</a></nav>
-<ul class="dxm-main"><li class="dxm-item">Nuovo</li><li class="dxm-item">Importa XML</li></ul>
+<ul class="dxm-main"><li class="dxm-item">Nuovo</li><li class="dxm-item">Importa XML</li><li class="dxm-item">3709813</li></ul>
 <a href="#ViewID=Impianto_ListView&ObjectKey=12">Impianti</a>
 <table class="dxgvTable">
   <tr class="dxgvDataRow"><td><a href="/rct/dettaglio?id=9">Rapporto di ROSSI MARIO</a></td></tr>
@@ -45,3 +45,4 @@ def test_niente_dati_dei_clienti(voci):
     assert "BIANCHI" not in tutto
     assert "ObjectKey" not in tutto
     assert "?" not in tutto
+    assert "3709813" not in tutto

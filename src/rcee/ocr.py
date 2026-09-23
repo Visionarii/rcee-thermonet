@@ -19,6 +19,7 @@ import urllib.request
 import zipfile
 from io import BytesIO
 from pathlib import Path
+from typing import Self
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -40,7 +41,9 @@ PACCHETTI_LLAMA = {
         "917f39c076402c421224824607397af20f53625a60defc20e8dd22446bf4c5d7",
     ),
 }
-URL_RELEASE_LLAMA = "https://github.com/ggml-org/llama.cpp/releases/download/{versione}/{file}"
+URL_RELEASE_LLAMA = (
+    "https://github.com/ggml-org/llama.cpp/releases/download/{versione}/{file}"
+)
 
 RIGHE_PROVA = [
     "RAPPORTO DI CONTROLLO DI EFFICIENZA ENERGETICA TIPO 1 (gruppi termici)",
@@ -72,10 +75,14 @@ def scarica_modello() -> tuple[Path, Path]:
     from huggingface_hub import hf_hub_download
 
     for nome, atteso in SHA256_MODELLO.items():
-        percorso = Path(hf_hub_download(REPO_MODELLO, nome, local_dir=cartella("modelli")))
+        percorso = Path(
+            hf_hub_download(REPO_MODELLO, nome, local_dir=cartella("modelli"))
+        )
         if _sha256(percorso) != atteso:
             percorso.unlink()
-            raise RuntimeError(f"{nome}: il file scaricato è corrotto. Rilancia il comando.")
+            raise RuntimeError(
+                f"{nome}: il file scaricato è corrotto. Rilancia il comando."
+            )
     return percorsi_modello()
 
 
@@ -84,7 +91,9 @@ def trova_llama_server() -> Path | None:
     if variabile := os.environ.get("RCEE_LLAMA_SERVER"):
         percorso = Path(variabile)
         if not percorso.is_file():
-            raise FileNotFoundError(f"RCEE_LLAMA_SERVER punta a un file che non esiste: {percorso}")
+            raise FileNotFoundError(
+                f"RCEE_LLAMA_SERVER punta a un file che non esiste: {percorso}"
+            )
         return percorso
     nome = "llama-server.exe" if platform.system() == "Windows" else "llama-server"
     if trovati := sorted(cartella("llama").rglob(nome)):
@@ -107,10 +116,14 @@ def installa_llama() -> Path:
     base = cartella("llama")
     archivio = base / nome
     print(f"Scarico {nome} da GitHub (llama.cpp {VERSIONE_LLAMA})...")
-    urllib.request.urlretrieve(URL_RELEASE_LLAMA.format(versione=VERSIONE_LLAMA, file=nome), archivio)
+    urllib.request.urlretrieve(
+        URL_RELEASE_LLAMA.format(versione=VERSIONE_LLAMA, file=nome), archivio
+    )
     if _sha256(archivio) != atteso:
         archivio.unlink()
-        raise RuntimeError(f"{nome}: il file scaricato è corrotto. Rilancia il comando.")
+        raise RuntimeError(
+            f"{nome}: il file scaricato è corrotto. Rilancia il comando."
+        )
     with zipfile.ZipFile(archivio) as contenuto:
         contenuto.extractall(base / VERSIONE_LLAMA)
     archivio.unlink()
@@ -122,12 +135,20 @@ def installa_llama() -> Path:
 def versione_llama(eseguibile: Path) -> str:
     try:
         uscita = subprocess.run(
-            [str(eseguibile), "--version"], capture_output=True, text=True, errors="replace", timeout=60
+            [str(eseguibile), "--version"],
+            capture_output=True,
+            text=True,
+            errors="replace",
+            timeout=60,
+            check=False,
         )
     except (OSError, subprocess.SubprocessError) as errore:
         return f"n/d ({errore})"
     righe = (uscita.stdout + uscita.stderr).strip().splitlines()
-    return next((riga for riga in righe if "version" in riga.lower()), righe[0] if righe else "n/d")
+    return next(
+        (riga for riga in righe if "version" in riga.lower()),
+        righe[0] if righe else "n/d",
+    )
 
 
 def installa() -> int:
@@ -150,7 +171,12 @@ class ServerOCR:
     """Avvia llama-server con il modello e lo chiude all'uscita: `with ServerOCR(...) as ocr`."""
 
     def __init__(
-        self, eseguibile: Path, modello: Path, mmproj: Path, log: Path, attesa_max: float = 600
+        self,
+        eseguibile: Path,
+        modello: Path,
+        mmproj: Path,
+        log: Path,
+        attesa_max: float = 600,
     ) -> None:
         self.eseguibile = eseguibile
         self.modello = modello
@@ -159,17 +185,33 @@ class ServerOCR:
         self.attesa_max = attesa_max
         self.secondi_avvio = 0.0
 
-    def __enter__(self) -> "ServerOCR":
+    def __enter__(self) -> Self:
         porta = _porta_libera()
         self.url = f"http://127.0.0.1:{porta}"
+        # Contesto e richieste fissati: stessa memoria occupata su ogni computer, una foto alla volta.
         comando = [
-            str(self.eseguibile), "-m", str(self.modello), "--mmproj", str(self.mmproj),
-            "--temp", "0", "--host", "127.0.0.1", "--port", str(porta),
+            str(self.eseguibile),
+            "-m",
+            str(self.modello),
+            "--mmproj",
+            str(self.mmproj),
+            "--temp",
+            "0",
+            "-c",
+            "8192",
+            "-np",
+            "1",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            str(porta),
         ]
         self.log.parent.mkdir(parents=True, exist_ok=True)
         self._file_log = self.log.open("w", encoding="utf-8")
         inizio = time.monotonic()
-        self._processo = subprocess.Popen(comando, stdout=self._file_log, stderr=subprocess.STDOUT)
+        self._processo = subprocess.Popen(
+            comando, stdout=self._file_log, stderr=subprocess.STDOUT
+        )
         try:
             self._attendi_pronto()
         except BaseException:
@@ -202,18 +244,32 @@ class ServerOCR:
             except (urllib.error.URLError, ConnectionError, TimeoutError):
                 pass  # non ancora in ascolto, oppure 503 mentre carica il modello
             time.sleep(0.5)
-        raise TimeoutError(f"llama-server non pronto dopo {self.attesa_max:.0f} s. Dettagli in {self.log}")
+        raise TimeoutError(
+            f"llama-server non pronto dopo {self.attesa_max:.0f} s. Dettagli in {self.log}"
+        )
 
     def leggi(
-        self, immagine: bytes, prompt: str = "OCR:", tipo: str = "image/png", max_token: int = 2048
+        self,
+        immagine: bytes,
+        prompt: str = "OCR:",
+        tipo: str = "image/png",
+        max_token: int = 2048,
     ) -> str:
         """Manda un'immagine al modello e restituisce il testo letto."""
         dati_immagine = base64.b64encode(immagine).decode()
         corpo = {
-            "messages": [{"role": "user", "content": [
-                {"type": "image_url", "image_url": {"url": f"data:{tipo};base64,{dati_immagine}"}},
-                {"type": "text", "text": prompt},
-            ]}],
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:{tipo};base64,{dati_immagine}"},
+                        },
+                        {"type": "text", "text": prompt},
+                    ],
+                }
+            ],
             "temperature": 0,
             "max_tokens": max_token,
         }
@@ -230,7 +286,9 @@ def immagine_prova() -> bytes:
     """PNG con intestazione e valori di un RCEE tipo 1 (testo stampato, non scritto a mano)."""
     carattere = ImageFont.load_default(size=32)
     misura = ImageDraw.Draw(Image.new("RGB", (1, 1)))
-    larghezza = int(max(misura.textlength(riga, font=carattere) for riga in RIGHE_PROVA)) + 80
+    larghezza = (
+        int(max(misura.textlength(riga, font=carattere) for riga in RIGHE_PROVA)) + 80
+    )
     immagine = Image.new("RGB", (larghezza, 60 + 56 * len(RIGHE_PROVA)), "white")
     disegno = ImageDraw.Draw(immagine)
     for numero, riga in enumerate(RIGHE_PROVA):

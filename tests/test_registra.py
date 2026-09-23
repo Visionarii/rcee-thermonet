@@ -6,7 +6,9 @@ from rcee.registra import comando_codegen
 
 
 def test_codegen_con_chrome():
-    comando = comando_codegen("https://portale/home", Path("s.json"), Path("out.py"), chrome=True)
+    comando = comando_codegen(
+        "https://portale/home", Path("s.json"), Path("out.py"), chrome=True
+    )
     assert comando[1:4] == ["-m", "playwright", "codegen"]
     assert comando[comando.index("--load-storage") + 1] == "s.json"
     assert comando[comando.index("-o") + 1] == "out.py"
@@ -21,7 +23,9 @@ def test_codegen_senza_chrome_usa_chromium():
 def test_opzioni_esistono_nella_versione_installata():
     aiuto = subprocess.run(
         [sys.executable, "-m", "playwright", "codegen", "--help"],
-        capture_output=True, text=True, check=True,
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout
     for opzione in ("--target", "--output", "--load-storage", "--channel"):
         assert opzione in aiuto

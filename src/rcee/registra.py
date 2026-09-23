@@ -17,8 +17,16 @@ from .config import URL_PORTALE, cartella
 
 def comando_codegen(url: str, sessione: Path, uscita: Path, chrome: bool) -> list[str]:
     comando = [
-        sys.executable, "-m", "playwright", "codegen",
-        "--target", "python", "-o", str(uscita), "--load-storage", str(sessione),
+        sys.executable,
+        "-m",
+        "playwright",
+        "codegen",
+        "--target",
+        "python",
+        "-o",
+        str(uscita),
+        "--load-storage",
+        str(sessione),
     ]
     if chrome:
         comando += ["--channel", "chrome"]
@@ -27,15 +35,22 @@ def comando_codegen(url: str, sessione: Path, uscita: Path, chrome: bool) -> lis
 
 def esegui() -> int:
     sessione = cartella("sessioni") / "registrazione.json"
-    uscita = cartella("registrazioni") / f"pratica-{datetime.now():%Y%m%d-%H%M}.py"
+    uscita = (
+        cartella("registrazioni")
+        / f"pratica-{datetime.now().astimezone():%Y%m%d-%H%M}.py"
+    )
 
-    print("PASSO 1. Si apre Chrome sul portale: fai il login. Questa parte NON viene registrata.")
+    print(
+        "PASSO 1. Si apre Chrome sul portale: fai il login. Questa parte NON viene registrata."
+    )
     try:
         with sync_playwright() as p:
             contesto, nome = apri_chrome(p, cartella("chrome-registrazione"))
             try:
                 pagina = contesto.pages[0] if contesto.pages else contesto.new_page()
-                pagina.goto(URL_PORTALE)
+                pagina.goto(
+                    URL_PORTALE, wait_until="commit"
+                )  # il portale reindirizza via JavaScript
                 input("Quando sei dentro il portale, torna qui e premi Invio... ")
                 url = pagina.url
                 contesto.storage_state(path=sessione)
@@ -45,11 +60,19 @@ def esegui() -> int:
         print("Il browser è stato chiuso prima di premere Invio: rilancia il comando.")
         return 1
 
-    print("\nPASSO 2. Si riapre il browser già dentro il portale: da qui ogni clic viene registrato.")
-    print("Inserisci una pratica vera dall'inizio alla fine, poi chiudi la finestra del browser.")
-    print("Se ti chiede di nuovo la password, NON scriverla: chiudi la finestra e avvisami.")
+    print(
+        "\nPASSO 2. Si riapre il browser già dentro il portale: da qui ogni clic viene registrato."
+    )
+    print(
+        "Inserisci una pratica vera dall'inizio alla fine, poi chiudi la finestra del browser."
+    )
+    print(
+        "Se ti chiede di nuovo la password, NON scriverla: chiudi la finestra e avvisami."
+    )
     try:
-        subprocess.run(comando_codegen(url, sessione, uscita, nome == GOOGLE_CHROME), check=True)
+        subprocess.run(
+            comando_codegen(url, sessione, uscita, nome == GOOGLE_CHROME), check=True
+        )
     finally:
         sessione.unlink(missing_ok=True)
     if not uscita.is_file():

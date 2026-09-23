@@ -12,7 +12,9 @@ def test_valori_letti_con_punto_spazi_e_minuscole():
 
 
 def test_valori_mancanti_elencati():
-    assert ocr.valori_mancanti("TIPO 1 55,0 28,0 3,5 9,7 98,8 92", ocr.VALORI_PROVA) == ["104"]
+    assert ocr.valori_mancanti(
+        "TIPO 1 55,0 28,0 3,5 9,7 98,8 92", ocr.VALORI_PROVA
+    ) == ["104"]
 
 
 def test_immagine_prova_contiene_tutte_le_righe():

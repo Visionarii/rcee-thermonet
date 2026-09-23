@@ -15,7 +15,12 @@ def _righe(comando: list[str]) -> list[str]:
     """Righe non vuote dell'output di un comando; lista vuota se il comando fallisce."""
     try:
         uscita = subprocess.run(
-            comando, capture_output=True, text=True, errors="replace", timeout=60, check=True
+            comando,
+            capture_output=True,
+            text=True,
+            errors="replace",
+            timeout=60,
+            check=True,
         ).stdout
     except (OSError, subprocess.SubprocessError):
         return []

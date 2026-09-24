@@ -131,4 +131,9 @@ uv sync
 - **"Failed to spawn: rcee"**: non sei nella cartella del progetto. Scrivi `cd rcee-thermonet`.
 - **L'antivirus blocca llama-server**: consenti il programma. È llama.cpp ufficiale,
   scaricato da GitHub e controllato con il suo checksum.
+- **"Un criterio di controllo dell'applicazione ha bloccato il file"**: è Smart App Control di
+  Windows, che la prima volta blocca i programmi nuovi. Aspetta qualche minuto e riprova,
+  oppure scrivi `uv run python -m rcee` al posto di `uv run rcee`.
+- **Il progetto sta in un'altra cartella** (per esempio su D:): entra con `cd` seguito dal
+  percorso tra virgolette, per esempio `cd "D:\Progetti\rcee-thermonet"`.
 - **Qualsiasi altro errore**: copia tutto il testo del Terminale e mandalo.
